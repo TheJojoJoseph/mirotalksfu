@@ -22,7 +22,7 @@ const RoomURL = window.location.href;
 
 const socket = io({ transports: ['websocket'] });
 
-const surveyActive = true;
+const surveyActive = false;
 
 const url = {
     ipLookup: 'https://extreme-ip-lookup.com/json/?key=demo2',
@@ -1260,7 +1260,7 @@ function handleRoomClientEvents() {
         if (surveyActive) {
             leaveFeedback();
         } else {
-            openURL('/newroom');
+            openURL('/');
         }
     });
 }
@@ -1290,7 +1290,7 @@ function leaveFeedback() {
         if (result.isConfirmed) {
             openURL(url.survey);
         } else {
-            openURL('/newroom');
+            openURL('/');
         }
     });
 }
