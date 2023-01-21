@@ -6,6 +6,10 @@ html {
 body {
     margin: 0;
 }
+.header-logo-image {
+    width: 20%;
+    height: auto;
+}
 article,
 aside,
 footer,
@@ -91,6 +95,7 @@ audio:not([controls]) {
     height: 0;
 }
 img {
+    width : 140px;
     border-style: none;
 }
 svg:not(:root) {
