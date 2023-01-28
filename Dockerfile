@@ -1,4 +1,4 @@
-FROM node:16-slim
+FROM node:16
 
 WORKDIR /src
 
@@ -8,6 +8,6 @@ RUN \
 
 COPY . .
 
-RUN npm install
+RUN yarn install
 
-CMD npm start
+CMD yarn start
