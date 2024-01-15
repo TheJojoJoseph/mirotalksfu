@@ -8,9 +8,11 @@ module.exports = class Peer {
         this.id = socket_id;
         this.peer_info = data.peer_info;
         this.peer_name = data.peer_info.peer_name;
+        this.peer_presenter = data.peer_info.peer_presenter;
         this.peer_audio = data.peer_info.peer_audio;
         this.peer_video = data.peer_info.peer_video;
         this.peer_video_privacy = data.peer_video_privacy;
+        this.peer_recording = data.peer_info.peer_recording;
         this.peer_hand = data.peer_info.peer_hand;
         this.transports = new Map();
         this.consumers = new Map();
@@ -49,6 +51,16 @@ module.exports = class Peer {
             case 'privacy':
                 this.peer_info.peer_video_privacy = data.status;
                 this.peer_video_privacy = data.status;
+                break;
+            case 'presenter':
+                this.peer_info.peer_presenter = data.status;
+                this.peer_presenter = data.status;
+                break;
+            case 'recording':
+                this.peer_info.peer_recording = data.status;
+                this.peer_recording = data.status;
+                break;
+            default:
                 break;
         }
     }
@@ -91,6 +103,21 @@ module.exports = class Peer {
 
         this.producers.set(producer.id, producer);
 
+        const producerType = producer.type;
+
+        if (['simulcast', 'svc'].includes(producerType)) {
+            const scalabilityMode = producer.rtpParameters.encodings[0].scalabilityMode;
+            const spatialLayer = parseInt(scalabilityMode.substring(1, 2)); // 1/2/3
+            const temporalLayer = parseInt(scalabilityMode.substring(3, 4)); // 1/2/3
+            log.debug(`Producer  [${producerType}] ----->`, {
+                scalabilityMode: scalabilityMode,
+                spatialLayer: spatialLayer,
+                temporalLayer: temporalLayer,
+            });
+        } else {
+            log.debug('Producer ----->', { producerType: producerType });
+        }
+
         producer.on(
             'transportclose',
             function () {
@@ -107,6 +134,7 @@ module.exports = class Peer {
     }
 
     closeProducer(producer_id) {
+        if (!this.producers.has(producer_id)) return;
         try {
             this.producers.get(producer_id).close();
         } catch (ex) {
@@ -127,17 +155,33 @@ module.exports = class Peer {
             consumer = await consumerTransport.consume({
                 producerId: producer_id,
                 rtpCapabilities,
+                enableRtx: true, // Enable NACK for OPUS.
                 paused: false,
             });
         } catch (error) {
             return console.error('Consume failed', error);
         }
 
-        if (consumer.type === 'simulcast') {
+        const consumerType = consumer.type;
+
+        // https://www.w3.org/TR/webrtc-svc/#scalabilitymodes*
+
+        if (['simulcast', 'svc'].includes(consumerType)) {
+            // simulcast - L1T3/L2T3/L3T3 | svc - L3T3
+            const scalabilityMode = consumer.rtpParameters.encodings[0].scalabilityMode;
+            const spatialLayer = parseInt(scalabilityMode.substring(1, 2)); // 1/2/3
+            const temporalLayer = parseInt(scalabilityMode.substring(3, 4)); // 1/2/3
             await consumer.setPreferredLayers({
-                spatialLayer: 2,
-                temporalLayer: 2,
+                spatialLayer: spatialLayer,
+                temporalLayer: temporalLayer,
             });
+            log.debug(`Consumer [${consumerType}] ----->`, {
+                scalabilityMode: scalabilityMode,
+                spatialLayer: spatialLayer,
+                temporalLayer: temporalLayer,
+            });
+        } else {
+            log.debug('Consumer ----->', { consumerType: consumerType });
         }
 
         this.consumers.set(consumer.id, consumer);
@@ -149,7 +193,7 @@ module.exports = class Peer {
                     peer_name: this.peer_info.peer_name,
                     consumer_id: consumer.id,
                 });
-                this.consumers.delete(consumer.id);
+                this.removeConsumer(consumer.id);
             }.bind(this),
         );
 
@@ -167,6 +211,8 @@ module.exports = class Peer {
     }
 
     removeConsumer(consumer_id) {
-        this.consumers.delete(consumer_id);
+        if (this.consumers.has(consumer_id)) {
+            this.consumers.delete(consumer_id);
+        }
     }
 };

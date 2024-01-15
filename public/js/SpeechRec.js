@@ -8,8 +8,15 @@ let isVoiceCommandSupported = browserLanguage.includes('en-');
 
 const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+/**
+ * Enable real-time voice recognition in the chat, allowing you to execute commands using your voice.
+ * Note: Currently, it supports only the English language.
+ * TODO make it multi languages...
+ */
 const commands = {
     shareRoom: 'room',
+    hideMe: 'hide me',
+    showMe: 'show me',
     newRoom: 'new room',
     leaveRoom: 'exit the room',
     audioOn: 'start the audio',
@@ -21,6 +28,7 @@ const commands = {
     chatOn: 'open the chat',
     chatSend: 'send',
     chatOff: 'close the chat',
+    toggleTr: 'toggle transcription',
     whiteboardOn: 'open the whiteboard',
     whiteboardOff: 'close the whiteboard',
     recordingOn: 'start the recording',
@@ -80,34 +88,37 @@ if (speechRecognition) {
     console.log('Speech recognition', recognition);
 
     recognition.onstart = function () {
-        console.log('Start speech recognition');
+        console.log('Speech recognition started');
         hide(chatSpeechStartButton);
         show(chatSpeechStopButton);
         setColor(chatSpeechStopButton, 'lime');
+        userLog('info', 'Speech recognition started', 'top-end');
     };
 
     recognition.onresult = (e) => {
         let current = e.resultIndex;
         let transcript = e.results[current][0].transcript;
-
-        if (transcript.trim().toLowerCase() != commands.chatSend) {
-            chatMessage.value = transcript;
-        }
-
-        if (isVoiceCommandsEnabled && isVoiceCommandSupported) {
-            execVoiceCommands(transcript);
+        if (transcript) {
+            if (transcript.trim().toLowerCase() != commands.chatSend) {
+                chatMessage.value = transcript;
+            }
+            if (isVoiceCommandsEnabled && isVoiceCommandSupported) {
+                execVoiceCommands(transcript);
+            }
         }
     };
 
     recognition.onerror = function (event) {
-        console.warn('Speech recognition error', event.error);
+        console.error('Speech recognition error', event.error);
+        userLog('error', `Speech recognition error ${event.error}`, 'top-end', 6000);
     };
 
     recognition.onend = function () {
-        console.log('Stop speech recognition');
+        console.log('Speech recognition stopped');
         show(chatSpeechStartButton);
         hide(chatSpeechStopButton);
         setColor(chatSpeechStopButton, 'white');
+        userLog('info', 'Speech recognition stopped', 'top-end');
     };
 
     isWebkitSpeechRecognitionSupported = true;
@@ -116,13 +127,13 @@ if (speechRecognition) {
     console.warn('This browser not supports webkitSpeechRecognition');
 }
 
-function startSpeech(action) {
-    if (action) {
-        recognition.lang = browserLanguage;
-        recognition.start();
-    } else {
-        recognition.stop();
-    }
+function startSpeech() {
+    recognition.lang = browserLanguage;
+    recognition.start();
+}
+
+function stopSpeech() {
+    recognition.stop();
 }
 
 function execVoiceCommands(transcript) {
@@ -130,6 +141,14 @@ function execVoiceCommands(transcript) {
         case commands.shareRoom:
             printCommand(commands.shareRoom);
             shareButton.click();
+            break;
+        case commands.hideMe:
+            printCommand(commands.hideMe);
+            hideMeButton.click();
+            break;
+        case commands.showMe:
+            printCommand(commands.showMe);
+            hideMeButton.click();
             break;
         case commands.newRoom:
             printCommand(commands.newRoom);
@@ -175,6 +194,9 @@ function execVoiceCommands(transcript) {
             printCommand(commands.chatOff);
             chatCloseButton.click();
             break;
+        case commands.toggleTr:
+            transcriptionButton.click();
+            break;
         case commands.whiteboardOn:
             printCommand(commands.whiteboardOn);
             whiteboardButton.click();
@@ -209,23 +231,23 @@ function execVoiceCommands(transcript) {
             break;
         case commands.participantsOn:
             printCommand(commands.participantsOn);
-            participantsButton.click();
+            chatButton.click();
             break;
         case commands.participantsOff:
             printCommand(commands.participantsOff);
-            participantsCloseBtn.click();
+            chatCloseButton.click();
             break;
         case commands.participantsVideoOff:
             printCommand(commands.participantsVideoOff);
-            rc.peerAction('me', rc.peer_id, 'hide', true, true);
+            rc.peerAction('me', socket.id, 'hide', true, true);
             break;
         case commands.participantsAudioOff:
             printCommand(commands.participantsAudioOff);
-            rc.peerAction('me', rc.peer_id, 'mute', true, true);
+            rc.peerAction('me', socket.id, 'mute', true, true);
             break;
         case commands.participantsKickOut:
             printCommand(commands.participantsKickOut);
-            rc.peerAction('me', rc.peer_id, 'eject', true, true);
+            rc.peerAction('me', socket.id, 'eject', true, true);
             break;
         case commands.fileShareOn:
             printCommand(commands.fileShareOn);
@@ -314,7 +336,7 @@ function execVoiceCommands(transcript) {
             break;
         case commands.survey:
             printCommand(commands.survey);
-            openURL(url.survey, true);
+            survey.enabled && openURL(survey.url, true);
             sound('open');
             break;
         case commands.stopRecognition:
@@ -322,6 +344,8 @@ function execVoiceCommands(transcript) {
             chatSpeechStopButton.click();
             break;
         // ...
+        default:
+            break;
     }
 }
 

@@ -1,11 +1,13 @@
-# <p align="center">MiroTalk SFU</p>
+<h1 align="center">MiroTalk SFU</h1>
 
-<p align="center">Free WebRTC - SFU - Simple, Secure, Scalable Real-Time Video Conferences Up to 4k, compatible with all browsers and platforms.</p>
+<br />
+
+<p align="center">Free WebRTC - SFU - Simple, Secure, Scalable Real-Time Video Conferences with support for up to 4k resolution. It's compatible with all major browsers and platforms</p>
 
 <hr />
 
 <p align="center">
-    <a href="https://sfu.mirotalk.com/">sfu.mirotalk.com</a>
+    <a href="https://sfu.mirotalk.com/">Explore MiroTalk SFU</a>
 </p>
 
 <hr />
@@ -18,46 +20,58 @@
 
 <hr />
 
+<p align="center">
+    Join our community for questions, discussions, and support on <a href="https://discord.gg/rgGYfeYW3N">Discord</a>
+</p>
+
+<hr />
+
 <details>
 <summary>Features</summary>
 
 <br/>
 
--   Is `100% Free` - `Open Source` - `Self Hosted` and [PWA](https://en.wikipedia.org/wiki/Progressive_web_application)!
--   No download, plug-in or login required, entirely browser-based
--   Unlimited number of conference rooms, without call time limitation
--   Desktop and Mobile compatible
--   Translated in 133 languages
--   Optimized Room URL Sharing (share it to your participants, wait for them to join)
--   Possibility to Password protect the Room for the meeting
--   Lobby mode lets you protect your meeting by only allowing people to enter after a formal approval by a moderator.
--   Webcam Streaming up to 4K quality (Front - Rear for mobile)
--   Echo cancellation and noise suppression that makes your audio crystal clear
--   Screen Sharing to present documents, slides, and more ...
--   File Sharing (with drag-and-drop), share any files to your participants in the room
--   Take a snapshot from the video frame(screen/cam) to save it as an image on your device.
--   Chat with Emoji Picker to show you feeling, private messages, Markdown support, possibility to Save the conversations, and many more.
+-   Is `100% Free` - `Open Source (AGPLv3)` - `Self Hosted` and [PWA](https://en.wikipedia.org/wiki/Progressive_web_application)!
+-   Unlimited conference rooms with no time limitations.
+-   Live broadcasting streaming.
+-   Translated into 133 languages.
+-   Host protection to prevent unauthorized access.
+-   User auth to prevent unauthorized access.
+-   Room password protection.
+-   Compatible with desktop and mobile devices.
+-   Optimized mobile room URL sharing.
+-   Webcam streaming with front and rear camera support for mobile devices.
+-   Crystal-clear audio streaming with speaking detection and volume indicators.
+-   Screen sharing for presentations.
+-   File sharing with drag-and-drop support.
+-   Choose your audio input, output, and video source.
+-   Supports video quality up to 4K.
+-   Supports advance Picture-in-Picture (PiP) offering a more streamlined and flexible viewing experience.
+-   Record your screen, audio, and video.
+-   Snapshot video frames and save them as PNG images.
+-   Chat with an Emoji Picker for expressing feelings, private messages, Markdown support, and conversation saving.
+-   ChatGPT (powered by OpenAI) for answering questions, providing information, and connecting users to relevant resources.
 -   Speech recognition, execute the app features simply with your voice.
--   Advance collaborative whiteboard for the teachers
--   Select Microphone - Speaker and Video source
--   Recording your Screen, Audio, or Video
--   Share any YouTube video in real-time to your participants
--   Share any mp4, webm, ogg video in real-time to your participants with possibility to download it
--   Full-Screen Mode on mouse click on the Video element
--   Possibility to Change UI Themes
--   Possibility to protect your Host with username and password (default disabled)
--   Supports [REST API](app/api/README.md) (Application Programming Interface)
--   [Slack](https://api.slack.com/apps/) API integration
--   [Sentry](https://sentry.io/) error reporting
+-   Push-to-talk functionality, similar to a walkie-talkie.
+-   Advanced collaborative whiteboard for teachers.
+-   Real-time sharing of YouTube embed videos, video files (MP4, WebM, OGG), and audio files (MP3).
+-   Full-screen mode with one-click video element zooming and pin/unpin.
+-   Customizable UI themes.
+-   Right-click options on video elements for additional controls.
+-   Supports [REST API](app/api/README.md) (Application Programming Interface).
+-   Integration with [Slack](https://api.slack.com/apps/) for enhanced communication.
+-   Utilizes [Sentry](https://sentry.io/) for error reporting.
+-   And much more...
 
 </details>
 
 <details>
 <summary>About</summary>
 
--   [Presentation](https://www.canva.com/design/DAE693uLOIU/view)
+<br>
 
--   [Video](https://www.youtube.com/watch?v=_IVn2aINYww)
+-   [Presentation](https://www.canva.com/design/DAE693uLOIU/view)
+-   [Video Overview](https://www.youtube.com/watch?v=_IVn2aINYww)
 
 </details>
 
@@ -66,18 +80,78 @@
 
 <br/>
 
--   You can `join` directly to `room` by going to
--   https://sfu.mirotalk.com/join?room=test&password=0&name=mirotalksfu&audio=0&video=0&screen=0&notify=0
+-   You can `directly join a room` by using link like:
+-   https://sfu.mirotalk.com/join?room=test&roomPassword=0&name=mirotalksfu&audio=0&video=0&screen=0&notify=0
 
-    | Params   | Type           | Description     |
-    | -------- | -------------- | --------------- |
-    | room     | string         | room Id         |
-    | password | string/boolean | room password   |
-    | name     | string         | user name       |
-    | audio    | boolean        | audio stream    |
-    | video    | boolean        | video stream    |
-    | screen   | boolean        | screen stream   |
-    | notify   | boolean        | welcome message |
+    | Params       | Type           | Description     |
+    | ------------ | -------------- | --------------- |
+    | room         | string         | Room Id         |
+    | roomPassword | string/boolean | Room password   |
+    | name         | string         | User name       |
+    | audio        | boolean        | Audio stream    |
+    | video        | boolean        | Video stream    |
+    | screen       | boolean        | Screen stream   |
+    | notify       | boolean        | Welcome message |
+    | hide         | boolean        | Hide myself     |
+    | username     | string         | Auth username   |
+    | password     | string         | Auth password   |
+
+> \[!NOTE]
+>
+> The `username` and `password` parameters are required when either `host.protected` or `host.user_auth` is set to `true` in the `app/src/config.js` file. The valid list of users is defined in the `host.users` configuration.
+
+</details>
+
+<details>
+<summary>Host Protection Configuration</summary>
+
+<br/>
+
+When [host.protected](https://github.com/miroslavpejic85/mirotalksfu/commit/ab21686e9ad4b75e14c3ee020141d61b33111dde#commitcomment-62398736) or `host.user_auth` is enabled, the host/users must provide a valid username and password as specified in the `app/src/config.js` file.
+
+| Params           | Value                                                                            | Description                                                                            |
+| ---------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `host.protected` | `true` if protection is enabled, `false` if not (default false)                  | Requires the host to provide a valid username and password during room initialization. |
+| `host.user_auth` | `true` if user authentication is required, `false` if not (default false).       | Determines whether host authentication is required.                                    |
+| `host.users`     | JSON array with user objects: `{"username": "username", "password": "password"}` | List of valid host users with their credentials.                                       |
+
+Example:
+
+```js
+    host: {
+        protected: true,
+        user_auth: true,
+        users: [
+            {
+                username: 'username',
+                password: 'password',
+            },
+            {
+                username: 'username2',
+                password: 'password2',
+            },
+            //...
+        ],
+    },
+```
+
+### Room Initialization
+
+To bypass the login page, join the room with URL parameters:
+
+-   [https://sfu.mirotalk.com/join/?room=test&username=username&password=password](https://sfu.mirotalk.com/join/?room=test&username=username&password=password)
+
+### Participant Room Entry
+
+If `host.protected` is enabled, participants can join after host authentication using:
+
+-   [https://sfu.mirotalk.com/join/test](https://sfu.mirotalk.com/join/test) (URL path)
+-   [https://sfu.mirotalk.com/join/?room=test&roomPassword=0&name=mirotalksfu&audio=0&video=0&screen=0&notify=0](https://sfu.mirotalk.com/join/?room=test&roomPassword=0&name=mirotalksfu&audio=0&video=0&screen=0&notify=0) (URL with query parameters)
+
+If `host.user_auth` is enabled, participants can join with mandatory credentials:
+
+-   [https://sfu.mirotalk.com/join/?room=test&username=username&password=password](https://sfu.mirotalk.com/join/?room=test&username=username&password=password) (URL path)
+-   [https://sfu.mirotalk.com/join/?room=test&name=mirotalk&audio=0&video=0&screen=0&notify=0&username=username&password=password](https://sfu.mirotalk.com/join/?room=test&name=mirotalk&audio=0&video=0&screen=0&&notify=0&username=username&password=password) (URL with query parameters)
 
 </details>
 
@@ -86,13 +160,13 @@
 
 <br/>
 
-Embedding a meeting into a service or app using an iframe.
+To embed a meeting in `your service or app` using an iframe, use the following code:
 
 ```html
 <iframe
     allow="camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write; autoplay"
     src="https://sfu.mirotalk.com/newroom"
-    style="height: 100%; width: 100%; border: 0px;"
+    style="height: 100vh; width: 100vw; border: 0px;"
 ></iframe>
 ```
 
@@ -103,7 +177,7 @@ Embedding a meeting into a service or app using an iframe.
 
 <br/>
 
--   You will need to have `NodeJS` and all [requirements](https://mediasoup.org/documentation/v3/mediasoup/installation/#requirements) installed, this project has been tested with Node version [16.X](https://nodejs.org/en/blog/release/v16.15.0/).
+-   Before running MiroTalk SFU, ensure you have `Node.js` and all [requirements](https://mediasoup.org/documentation/v3/mediasoup/installation/#requirements) installed. This project has been tested with Node version [16.X](https://nodejs.org/en/blog/release/v16.15.1/) and [18.X](https://nodejs.org/en/download).
 
 -   Requirements install example for `Ubuntu 20.04`
 
@@ -114,12 +188,12 @@ $ apt-get install -y build-essential
 # Python 3.8 and pip
 $ DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 $ apt install -y software-properties-common
-$ add-apt-repository ppa:deadsnakes/ppa
+$ add-apt-repository -y ppa:deadsnakes/ppa
 $ apt update
 $ apt install -y python3.8 python3-pip
-# NodeJS 16.X and npm
+# NodeJS 18.X and npm
 $ apt install -y curl dirmngr apt-transport-https lsb-release ca-certificates
-$ curl -sL https://deb.nodesource.com/setup_16.x | bash -
+$ curl -sL https://deb.nodesource.com/setup_18.x | bash -
 $ apt-get install -y nodejs
 $ npm install -g npm@latest
 ```
@@ -141,7 +215,13 @@ $ npm start
 $ PORT=3011 npm start
 ```
 
--   Open in browser https://localhost:3010 or `:3011` if default port changed.
+-   Open [https://localhost:3010](https://localhost:3010) or `:3011` if the default port has been changed in your browser.
+
+<br/>
+
+> \[!NOTE]
+>
+> To run `MiroTalk SFU` on a `Windows operating system`, you can follow the instructions provided in [this documentation](https://github.com/miroslavpejic85/mirotalksfu/issues/99#issuecomment-1586073853).
 
 </details>
 
@@ -152,9 +232,8 @@ $ PORT=3011 npm start
 
 ![docker](public/images/docker.png)
 
--   Install docker engine: https://docs.docker.com/engine/install/
--   Install docker compose: https://docs.docker.com/compose/install/
--   Repository docker hub: https://hub.docker.com/r/mirotalk/sfu
+-   Repository [docker hub](https://hub.docker.com/r/mirotalk/sfu)
+-   Install [docker engine](https://docs.docker.com/engine/install/) and [docker compose](https://docs.docker.com/compose/install/)
 
 ```bash
 # Copy app/src/config.template.js in app/src/config.js IMPORTANT (edit it according to your needs)
@@ -169,57 +248,34 @@ $ docker-compose up # -d
 $ docker-compose down
 ```
 
--   Open in browser https://localhost:3010
+-   Open [https://localhost:3010](https://localhost:3010) in your browser.
 
 </details>
 
 <details>
-<summary>Ngrok - Https</summary>
+<summary>Documentations</summary>
 
-<br/>
+<br>
 
-You can start videoconferencing directly from your Local PC, and be reachable from any device outside your network, simply by following [these documentation](docs/ngrok.md).
+-   `Ngrok/HTTPS:` You can start a video conference directly from your local PC and make it accessible from any device outside your network by following [these instructions](docs/ngrok.md), or expose it directly on [HTTPS](app/ssl/README.md).
 
-</details>
+-   `Self-hosting:` For `self-hosting MiroTalk SFU` on your own dedicated server, please refer to [this comprehensive guide](docs/self-hosting.md). It will provide you with all the necessary instructions to get your MiroTalk SFU instance up and running smoothly.
 
-<details>
-<summary>Self Hosting</summary>
+-   `Rest API:` The [API documentation](https://docs.mirotalk.com/mirotalk-sfu/api/) uses [swagger](https://swagger.io/) at https://localhost:3010/api/v1/docs or check it on live [here](https://sfu.mirotalk.com/api/v1/docs).
 
-<br/>
-
-To `Self-Host MiroTalk SFU` on `Your` dedicated `Server`, read [this documentation](docs/self-hosting.md).
-
-</details>
-
-<details>
-<summary>Notes</summary>
-
-<br/>
-
--   Run the project on a `Linux or Mac` system as the `mediasoup` installation could have issues on `Windows`.
-
-</details>
-
-<details>
-<summary>Rest API</summary>
-
-<br/>
-
--   The API documentation uses [swagger](https://swagger.io/) at https://localhost:3010/api/v1/docs or check it on live [here](https://sfu.mirotalk.com/api/v1/docs).
-
-```bash
-# The response will give you a entrypoint / Room URL for your meeting.
-$ curl -X POST "http://localhost:3010/api/v1/meeting" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json"
-$ curl -X POST "https://sfu.mirotalk.com/api/v1/meeting" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json"
-# The response will give you a entrypoint / URL for the direct join to the meeting.
-$ curl -X POST "http://localhost:3010/api/v1/join" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json" --data '{"room":"test","name":"mirotalksfu","audio":"0","video":"0","screen":"0","notify":"0"}'
-$ curl -X POST "https://sfu.mirotalk.com/api/v1/join" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json" --data '{"room":"test","name":"mirotalksfu","audio":"0","video":"0","screen":"0","notify":"0"}'
-```
+    ```bash
+    # The response will give you a entrypoint / Room URL for your meeting.
+    $ curl -X POST "http://localhost:3010/api/v1/meeting" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json"
+    $ curl -X POST "https://sfu.mirotalk.com/api/v1/meeting" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json"
+    # The response will give you a entrypoint / URL for the direct join to the meeting.
+    $ curl -X POST "http://localhost:3010/api/v1/join" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json" --data '{"room":"test","password":"false","name":"mirotalksfu","audio":"false","video":"false","screen":"false","notify":"false"}'
+    $ curl -X POST "https://sfu.mirotalk.com/api/v1/join" -H "authorization: mirotalksfu_default_secret" -H "Content-Type: application/json" --data '{"room":"test","password":"false","name":"mirotalksfu","audio":"false","video":"false","screen":"false","notify":"false"}'
+    ```
 
 </details>
 
 <details open>
-<summary>Hetzner</summary>
+<summary>Hetzner & Contabo</summary>
 
 <br/>
 
@@ -233,7 +289,13 @@ Use [my personal link](https://hetzner.cloud/?ref=XdRifCzCK3bn) to receive `€�
 
 ---
 
-If you need help to deploy `MiroTalk SFU` instance on `your dedicated cloud server`, or for other needs, don't hesitate to contact us at sfu.mirotalk@gmail.com
+[![Contabo](public/advertisers/ContaboLogo.png)](https://www.dpbolvw.net/click-101027391-14462707)
+
+Experience also top-tier German web hosting – dedicated servers, VPS, and web hosting at `unbeatable prices`. Reliable, secure, and backed by 24/7 support. [Explore now here](https://www.dpbolvw.net/click-101027391-14462707)
+
+---
+
+To set up your own instance of `MiroTalk SFU` on a dedicated cloud server, please refer to our comprehensive [self-hosting documentation](https://docs.mirotalk.com/mirotalk-sfu/self-hosting/). This guide will walk you through the process step by step, ensuring a smooth and successful deployment.
 
 </details>
 
@@ -245,8 +307,6 @@ If you need help to deploy `MiroTalk SFU` instance on `your dedicated cloud serv
 [![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg)](https://www.digitalocean.com/?refcode=1070207afbb1&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
 
 For personal use, you can start with a single $5 a month cloud server and scale up as needed. You can use [this link](https://m.do.co/c/1070207afbb1) to get a `$100 credit for the first 60 days`.
-
-If you need help to deploy `MiroTalk SFU` instance on `your dedicated cloud server`, or for other needs, don't hesitate to contact us at sfu.mirotalk@gmail.com
 
 </details>
 
@@ -285,24 +345,15 @@ https://sfu.mirotalk.com
 </details>
 
 <details>
-<summary>Questions, Discussions and support</summary>
-
-<br/>
-
--   For questions, discussions, help & support, join with us on [Discord](https://discord.gg/rgGYfeYW3N)
-
-</details>
-
-<details>
 <summary>License</summary>
 
 <br/>
 
 [![AGPLv3](public/images/AGPLv3.png)](LICENSE)
 
-MiroTalk is free and can be modified and forked. But the conditions of the AGPLv3 (GNU Affero General Public License v3.0) need to be respected. In particular modifications need to be free as well and made available to the public. Get a quick overview of the license at [Choose an open source license](https://choosealicense.com/licenses/agpl-3.0/).
+MiroTalk SFU is free and open-source under the terms of AGPLv3 (GNU Affero General Public License v3.0). Please `respect the license conditions`, In particular `modifications need to be free as well and made available to the public`. Get a quick overview of the license at [Choose an open source license](https://choosealicense.com/licenses/agpl-3.0/).
 
-For a MiroTalk license under conditions other than AGPLv3, please contact us at license.mirotalk@gmail.com or [buy directly via CodeCanyon](https://codecanyon.net/item/mirotalk-sfu-webrtc-realtime-video-conferences/40769970).
+To obtain a [MiroTalk SFU license](https://docs.mirotalk.com/license/licensing-options/) with terms different from the AGPLv3, you can conveniently make your [purchase on CodeCanyon](https://codecanyon.net/item/mirotalk-sfu-webrtc-realtime-video-conferences/40769970). This allows you to tailor the licensing conditions to better suit your specific requirements.
 
 </details>
 
@@ -311,27 +362,67 @@ For a MiroTalk license under conditions other than AGPLv3, please contact us at 
 
 <br/>
 
-Do you find MiroTalk useful?
+Do you find MiroTalk SFU indispensable for your needs? Join us in supporting this transformative project by [becoming a backer or sponsor](https://github.com/sponsors/miroslavpejic85). By doing so, not only will your logo prominently feature here, but you'll also drive the growth and sustainability of MiroTalk SFU. Your support is vital in ensuring that this valuable platform continues to thrive and remain accessible for all. Make an impact – back MiroTalk SFU today and be part of this exciting journey!
 
-Support the project by [becoming a backer or sponsor](https://github.com/sponsors/miroslavpejic85). Your logo will show up here with a link to your website.
-
-|                                                                                   |                                                                                    |
-| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [![BroadcastX](public/sponsors/BroadcastX.png)](https://broadcastx.de/)           | [![Hetzner](public/sponsors/Hetzner.png)](https://hetzner.cloud/?ref=XdRifCzCK3bn) |
-| [![LuvLounge](public/sponsors/LuvLounge.png)](https://luvlounge.ca)               | [![QuestionPro](public/sponsors/QuestionPro.png)](https://www.questionpro.com)     |
-| [![BrowserStack](public/sponsors/BrowserStack.png)](https://www.browserstack.com) |
+|                                                                                   |                                                                                        |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [![BroadcastX](public/sponsors/BroadcastX.png)](https://broadcastx.de/)           | [![Hetzner](public/sponsors/HetznerLogo.png)](https://hetzner.cloud/?ref=XdRifCzCK3bn) |
+| [![LuvLounge](public/sponsors/LuvLounge.png)](https://luvlounge.ca)               | [![QuestionPro](public/sponsors/QuestionPro.png)](https://www.questionpro.com)         |
+| [![BrowserStack](public/sponsors/BrowserStack.png)](https://www.browserstack.com) | [![CrystalSound](public/sponsors/CrystalSound.png)](https://crystalsound.ai)           |
 
 </details>
 
-<br/>
+<details open>
+<summary>Advertisers</summary>
+
+---
+
+[![Contabo](public/advertisers/ContaboLogo.png)](https://www.dpbolvw.net/click-101027391-14462707)
+
+---
+
+</details>
+
+## Diving into Additional MiroTalk Projects:
 
 <details>
 <summary>MiroTalk P2P</summary>
 
 <br/>
 
-Try also [MiroTalk P2P](https://github.com/miroslavpejic85/mirotalk), the difference between the two projects you can found [here](https://github.com/miroslavpejic85/mirotalksfu/issues/14#issuecomment-932701999).
+Try also [MiroTalk P2P](https://github.com/miroslavpejic85/mirotalk) `peer to peer` real-time video conferences, optimized for small groups. `Unlimited time, unlimited concurrent rooms` each having 5-8 participants.
 
 </details>
 
+<details>
+<summary>MiroTalk C2C</summary>
+
+<br>
+
+Try also [MiroTalk C2C](https://github.com/miroslavpejic85/mirotalkc2c) `peer to peer` real-time video conferences, optimized for cam 2 cam. `Unlimited time, unlimited concurrent rooms` each having 2 participants.
+
+</details>
+
+<details>
+<summary>MiroTalk BRO</summary>
+
+<br>
+
+Try also [MiroTalk BRO](https://github.com/miroslavpejic85/mirotalkbro) `Live broadcast` (peer to peer) live video, audio and screen stream to all connected users (viewers). `Unlimited time, unlimited concurrent rooms` each having a broadcast and many viewers.
+
+</details>
+
+<details>
+<summary>MiroTalk WEB</summary>
+
+<br>
+
+Try also [MiroTalk WEB](https://github.com/miroslavpejic85/mirotalkwebrtc) a platform that allows for the management of an `unlimited number of users`. Each user must register with their email, username, and password, after which they gain access to their `personal dashboard`. Within the dashboard, users can `manage their rooms and schedule meetings` using the desired version of MiroTalk on a specified date and time. Invitations to these meetings can be sent via email, shared through the web browser, or sent via SMS.
+
+</details>
+
+---
+
 This project is tested with [BrowserStack](https://www.browserstack.com).
+
+---

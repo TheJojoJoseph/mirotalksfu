@@ -7,7 +7,7 @@ module.exports = class ServerApi {
     constructor(host = null, authorization = null) {
         this._host = host;
         this._authorization = authorization;
-        this._api_key_secret = config.apiKeySecret;
+        this._api_key_secret = config.api.keySecret;
     }
 
     isAuthorized() {
@@ -25,8 +25,8 @@ module.exports = class ServerApi {
             this._host +
             '/join?room=' +
             data.room +
-            '&password=' +
-            data.password +
+            '&roomPassword=' +
+            data.roomPassword +
             '&name=' +
             data.name +
             '&audio=' +

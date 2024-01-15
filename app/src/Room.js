@@ -8,15 +8,30 @@ module.exports = class Room {
     constructor(room_id, worker, io) {
         this.id = room_id;
         this.worker = worker;
-        this.router = null;
-        this.audioLevelObserver = null;
-        this.audioLevelObserverEnabled = false;
-        this.audioLastUpdateTime = 0;
         this.io = io;
+        this.audioLevelObserver = null;
+        this.audioLevelObserverEnabled = true;
+        this.audioLastUpdateTime = 0;
+        // ##########################
+        this._isBroadcasting = false;
+        // ##########################
         this._isLocked = false;
         this._isLobbyEnabled = false;
         this._roomPassword = null;
+        this._hostOnlyRecording = false;
+        this._moderator = {
+            audio_start_muted: false,
+            video_start_hidden: false,
+            audio_cant_unmute: false,
+            video_cant_unhide: false,
+            screen_cant_share: false,
+            chat_cant_privately: false,
+            chat_cant_chatgpt: false,
+        };
+        this.survey = config.survey;
+        this.redirect = config.redirect;
         this.peers = new Map();
+        this.router = null;
         this.createTheRouter();
     }
 
@@ -49,8 +64,8 @@ module.exports = class Room {
 
         this.audioLevelObserver = await router.createAudioLevelObserver({
             maxEntries: 1,
-            threshold: -80,
-            interval: 800,
+            threshold: -70,
+            interval: 100,
         });
 
         this.audioLevelObserver.on('volumes', (volumes) => {
@@ -58,16 +73,15 @@ module.exports = class Room {
         });
         this.audioLevelObserver.on('silence', () => {
             //log.debug('audioLevelObserver', { volume: 'silence' });
-            return;
         });
     }
 
     sendActiveSpeakerVolume(volumes) {
-        if (Date.now() > this.audioLastUpdateTime + 1000) {
+        if (Date.now() > this.audioLastUpdateTime + 100) {
             this.audioLastUpdateTime = Date.now();
             const { producer, volume } = volumes[0];
-            let audioVolume = Math.round(Math.pow(10, volume / 80) * 10); // 1-10
-            if (audioVolume > 2) {
+            let audioVolume = Math.round(Math.pow(10, volume / 70) * 10); // 1-10
+            if (audioVolume > 1) {
                 // log.debug('PEERS', this.peers);
                 this.peers.forEach((peer) => {
                     peer.producers.forEach((peerProducer) => {
@@ -77,7 +91,7 @@ module.exports = class Room {
                             peer.peer_audio === true
                         ) {
                             let data = { peer_name: peer.peer_name, peer_id: peer.id, audioVolume: audioVolume };
-                            // log.debug('audioLevelObserver id [' + this.id + ']', data);
+                            //log.debug('audioLevelObserver id [' + this.id + ']', data);
                             this.broadCast(0, 'audioVolume', data);
                         }
                     });
@@ -97,6 +111,62 @@ module.exports = class Room {
     }
 
     // ####################################################
+    // ROOM MODERATOR
+    // ####################################################
+
+    updateRoomModeratorALL(data) {
+        this._moderator = data;
+        log.debug('Update room moderator all data', this._moderator);
+    }
+
+    updateRoomModerator(data) {
+        log.debug('Update room moderator', data);
+        switch (data.type) {
+            case 'audio_start_muted':
+                this._moderator.audio_start_muted = data.status;
+                break;
+            case 'video_start_hidden':
+                this._moderator.video_start_hidden = data.status;
+            case 'audio_cant_unmute':
+                this._moderator.audio_cant_unmute = data.status;
+                break;
+            case 'video_cant_unhide':
+                this._moderator.video_cant_unhide = data.status;
+            case 'screen_cant_share':
+                this._moderator.screen_cant_share = data.status;
+                break;
+            case 'chat_cant_privately':
+                this._moderator.chat_cant_privately = data.status;
+                break;
+            case 'chat_cant_chatgpt':
+                this._moderator.chat_cant_chatgpt = data.status;
+                break;
+            default:
+                break;
+        }
+    }
+
+    // ####################################################
+    // ROOM INFO
+    // ####################################################
+
+    toJson() {
+        return {
+            id: this.id,
+            broadcasting: this._isBroadcasting,
+            config: {
+                isLocked: this._isLocked,
+                isLobbyEnabled: this._isLobbyEnabled,
+                hostOnlyRecording: this._hostOnlyRecording,
+            },
+            moderator: this._moderator,
+            survey: this.survey,
+            redirect: this.redirect,
+            peers: JSON.stringify([...this.peers]),
+        };
+    }
+
+    // ####################################################
     // PEERS
     // ####################################################
 
@@ -110,13 +180,6 @@ module.exports = class Room {
 
     getPeersCount() {
         return this.peers.size;
-    }
-
-    toJson() {
-        return {
-            id: this.id,
-            peers: JSON.stringify([...this.peers]),
-        };
     }
 
     getProducerListForPeer() {
@@ -140,6 +203,7 @@ module.exports = class Room {
     }
 
     async removePeer(socket_id) {
+        if (!this.peers.has(socket_id)) return;
         this.peers.get(socket_id).close();
         this.peers.delete(socket_id);
     }
@@ -206,8 +270,8 @@ module.exports = class Room {
                     {
                         producer_id: producer.id,
                         producer_socket_id: socket_id,
-                        peer_name: this.peers.get(socket_id).peer_name,
-                        peer_info: this.peers.get(socket_id).peer_info,
+                        peer_name: this.peers.get(socket_id)?.peer_name,
+                        peer_info: this.peers.get(socket_id)?.peer_info,
                         type: type,
                     },
                 ]);
@@ -226,7 +290,7 @@ module.exports = class Room {
                 rtpCapabilities,
             })
         ) {
-            return log.error('Can not consume', {
+            return log.warn('Can not consume', {
                 socket_id: socket_id,
                 consumer_transport_id: consumer_transport_id,
                 producer_id: producer_id,
@@ -241,7 +305,7 @@ module.exports = class Room {
             'producerclose',
             function () {
                 log.debug('Consumer closed due to producerclose event', {
-                    peer_name: this.peers.get(socket_id).peer_name,
+                    peer_name: this.peers.get(socket_id)?.peer_name,
                     consumer_id: consumer.id,
                 });
                 this.peers.get(socket_id).removeConsumer(consumer.id);
@@ -265,6 +329,10 @@ module.exports = class Room {
     // ROOM STATUS
     // ####################################################
 
+    // GET
+    isBroadcasting() {
+        return this._isBroadcasting;
+    }
     getPassword() {
         return this._roomPassword;
     }
@@ -274,12 +342,23 @@ module.exports = class Room {
     isLobbyEnabled() {
         return this._isLobbyEnabled;
     }
+    isHostOnlyRecording() {
+        return this._hostOnlyRecording;
+    }
+
+    // SET
+    setIsBroadcasting(status) {
+        this._isBroadcasting = status;
+    }
     setLocked(status, password) {
         this._isLocked = status;
         this._roomPassword = password;
     }
     setLobbyEnabled(status) {
         this._isLobbyEnabled = status;
+    }
+    setHostOnlyRecording(status) {
+        this._hostOnlyRecording = status;
     }
 
     // ####################################################
